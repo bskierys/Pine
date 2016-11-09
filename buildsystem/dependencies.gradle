@@ -1,0 +1,45 @@
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('gradle.properties').newDataInputStream())
+
+def versionMajor = properties.getProperty('versionMajor')
+def versionMinor = properties.getProperty('versionMinor')
+def versionPatch = properties.getProperty('versionPatch')
+
+ext {
+    libraryMinSdkVersion = 9
+    libraryTargetSdkVersion = 24
+    libraryCompileSdkVersion = 24
+    libraryBuildToolsVersion = "24.0.0"
+    libraryVersionCode = versionMajor.toInteger() * 10000 + versionMinor.toInteger() * 100 + versionPatch.toInteger()
+    libraryVersionName = "${versionMajor}.${versionMinor}.${versionPatch}"
+
+    //Libraries
+    androidSupportVersion = '24.2.1'
+    junitVersion = '4.12'
+    butterKnifeVersion = '8.4.0'
+    robolectricVersion = '3.0'
+    timberVersion = '4.3.1'
+
+    mobileDependencies = [
+            // Android
+            appcompat           : "com.android.support:appcompat-v7:${androidSupportVersion}",
+            support             : "com.android.support:support-v4:${androidSupportVersion}",
+
+            // Timber
+            timber              : "com.jakewharton.timber:timber:${timberVersion}",
+
+            // ButterKnife
+            butterknife         : "com.jakewharton:butterknife:${butterKnifeVersion}",
+            butterknife_compiler: "com.jakewharton:butterknife-compiler:${butterKnifeVersion}",
+
+            // Unit test dependencies
+            junit               : "junit:junit:${junitVersion}",
+            robolectric         : "org.robolectric:robolectric:${robolectricVersion}",
+    ]
+}

@@ -1,4 +1,4 @@
-package com.github.bskierys.pine.sample;
+package com.github.bskierys.pine.sample.ui;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
