@@ -1,17 +1,16 @@
 apply plugin: 'com.android.library'
 
+def globalConfiguration = rootProject.extensions.getByName("ext")
+
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.0"
+    compileSdkVersion globalConfiguration.getAt("libraryCompileSdkVersion")
+    buildToolsVersion globalConfiguration.getAt("libraryBuildToolsVersion")
 
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 24
-        versionCode 1
-        versionName "1.0"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
+        minSdkVersion globalConfiguration.getAt("libraryMinSdkVersion")
+        targetSdkVersion globalConfiguration.getAt("libraryTargetSdkVersion")
+        versionCode globalConfiguration.getAt("libraryVersionCode")
+        versionName globalConfiguration.getAt("libraryVersionName")
     }
     buildTypes {
         release {
@@ -24,10 +23,14 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.jakewharton.timber:timber:4.3.1'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    testCompile 'junit:junit:4.12'
+    def mobileDependencies = rootProject.ext.mobileDependencies
+
+    // Timber
+    compile mobileDependencies.timber
+
+    // Android
+    compile mobileDependencies.support
+
+    // unit testing
+    testCompile mobileDependencies.junit
 }

@@ -1,0 +1,26 @@
+machine:
+    java:
+        version: oraclejdk8
+
+## Customize dependencies
+dependencies:
+   pre:
+    - echo y | android update sdk --no-ui --all --filter "tools,android-24,build-tools-24.0.0,platform-tools,extra-android-m2repository,extra-google-m2repository,extra-google-google_play_services"
+   override:
+    - chmod +x gradlew
+	
+
+test:
+  override:
+    # start the emulator
+    - emulator -avd circleci-android22 -no-audio -no-window:
+        background: true
+        parallel: true
+    # wait for it to have booted
+    - circle-android wait-for-boot
+    # run tests  against the emulator.
+    - ./gradlew connectedAndroidTest
+    # copy the build outputs to artifacts
+    - cp -r library/build/outputs $CIRCLE_ARTIFACTS
+    # copy the test results to the test results directory.
+    - cp -r library/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
