@@ -25,6 +25,7 @@ ext {
     butterKnifeVersion = '8.4.0'
     robolectricVersion = '3.0'
     timberVersion = '4.3.1'
+    rxjavaVersion = '1.2.2'
 
     mobileDependencies = [
             // Android
@@ -33,6 +34,9 @@ ext {
 
             // Timber
             timber              : "com.jakewharton.timber:timber:${timberVersion}",
+
+            // Rx
+            rxjava              : "io.reactivex:rxjava:${rxjavaVersion}",
 
             // ButterKnife
             butterknife         : "com.jakewharton:butterknife:${butterKnifeVersion}",

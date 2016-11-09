@@ -5,8 +5,19 @@
 */
 package com.github.bskierys.pine.sample;
 
-/**
- * TODO: Generic description. Replace with real one.
- */
-public class App {
+import android.app.Application;
+
+import com.github.bskierys.pine.Pine;
+
+import timber.log.Timber;
+
+public class App extends Application {
+    @Override public void onCreate() {
+        super.onCreate();
+
+        // plant a pine at the beginning of application lifecycle
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Pine());
+        }
+    }
 }
