@@ -17,7 +17,7 @@ public class App extends Application {
 
         // plant a pine at the beginning of application lifecycle
         if (BuildConfig.DEBUG) {
-            Timber.plant(new Pine());
+            Timber.plant(new Pine(this, "pine"));
         }
     }
 }

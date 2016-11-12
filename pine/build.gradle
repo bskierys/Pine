@@ -33,4 +33,5 @@ dependencies {
 
     // unit testing
     testCompile mobileDependencies.junit
+    testCompile mobileDependencies.mockito
 }
