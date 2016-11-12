@@ -107,7 +107,7 @@ public class Pine extends Timber.DebugTree {
         return original;
     }
 
-    private String createStackElementMessage(String originalMessage, StackTraceElement element) {
+    String createStackElementMessage(String originalMessage, StackTraceElement element) {
         return getClassName(element)
                 + ", " + element.getMethodName()
                 + ", " + Integer.toString(element.getLineNumber())
