@@ -26,8 +26,12 @@ public class MainActivity extends AppCompatActivity {
         Observable.interval(EXCEPTION_SPAM_PERIOD, TimeUnit.MILLISECONDS)
                   .subscribe(number -> {
                       // you can see every log with package, class, and line number when it have happened
-                      if (number % 5 == 0) {
-                          Timber.e("Simple periodic spam of exception number %d", number);
+                      if (number % 20 == 0) {
+                          try {
+                              throw new NullPointerException("Nobody expects NullPointerException!");
+                          } catch (NullPointerException ex) {
+                              Timber.e(ex, "Example of logging exception");
+                          }
                       } else {
                           Timber.d("Debug message");
                       }
