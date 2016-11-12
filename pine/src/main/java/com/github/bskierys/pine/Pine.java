@@ -5,6 +5,7 @@
 */
 package com.github.bskierys.pine;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import java.util.regex.Matcher;
@@ -14,29 +15,56 @@ import timber.log.Timber;
 
 /**
  * Replacement for {@link timber.log.Timber.DebugTree} that constructs tags in way that can be easy searched within
- * android monitor. Tag goes like this: tbi.{package name without pl.ipebk.tabi to lower case. Ah and all vowels
- * are deleted} f.ex "tbi.cmmnctn.bltth.wrpprs" means class "pl.ipebk.tabi.communication.bluetooth.wrappers". Logged
- * message is aldo prefixed with class name, method and line of code that was logged.
+ * android monitor.
+ * <p>
+ * <li>Default tag pattern for your package: {@link #packageTag}.{package name without base package. Vowels are removed
+ * to match tag length limit}.</li>
+ * <p>
+ * <li>Default log message: {class name}, {method name}, {line number} ---> {message}</li>
+ * <p>
+ * <li>Default tag pattern for other packages: {package name without base package. Vowels are removed to match tag
+ * length limit}.</li>
  */
 public class Pine extends Timber.DebugTree {
     private static final int CALL_STACK_INDEX = 5;
-    private static final String PACKAGE = "pl.ipebk.tabi";
-    private static final String TAG = "tbi";
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$");
     private static final String DELIMITER = " ---> ";
 
+    private String packageName;
+    private String packageTag;
+
+    /**
+     * Grows basic {@link Pine}.
+     *
+     * @param context Context to get package name from
+     * @param packageTag Simple tag to replace your base package in logs
+     */
+    public Pine(Context context, String packageTag) {
+        this.packageTag = packageTag;
+        this.packageName = context.getPackageName();
+    }
+
     @Override protected String createStackElementTag(StackTraceElement element) {
-        String[] path = getPackageName(element).split("\\.");
-
         StringBuilder tag = new StringBuilder();
-        tag.append(getPrefix(path));
-        path = removePackage(path);
 
-        for (String pathElement : path) {
+        String packageName = getPackageName(element);
+        if (packageName.contains(this.packageName)) {
+            packageName = packageName.replace(this.packageName + ".", "");
+            tag.append(packageTag);
+            tag.append(".");
+        }
+
+        String[] path = packageName.split("\\.");
+
+        for (int i = 0; i < path.length; i++) {
+            String pathElement = path[i];
             pathElement = replaceCamelsWithDots(pathElement).toLowerCase();
             String newElement = removeVowels(pathElement);
 
-            tag.append(".");
+            if (i != 0) {
+                tag.append(".");
+            }
+
             if (newElement.equals("")) {
                 tag.append(pathElement);
             } else {
@@ -45,36 +73,6 @@ public class Pine extends Timber.DebugTree {
         }
 
         return tag.toString();
-    }
-
-    private String getPrefix(String[] path) {
-        if (path.length < 3) {
-            return TAG;
-        }
-
-        String mainPackageName = path[0] + "." + path[1] + "." + path[2];
-
-        if (isOurPackage(mainPackageName)) {
-            return TAG;
-        } else {
-            return path[2].toUpperCase();
-        }
-    }
-
-    private boolean isOurPackage(String packageName) {
-        return packageName.startsWith(PACKAGE);
-    }
-
-    private String[] removePackage(String[] path) {
-        if (path.length > 3) {
-            String[] pathWithoutPackage = new String[path.length - 3];
-            for (int i = 0; i < path.length - 3; i++) {
-                pathWithoutPackage[i] = path[i + 3];
-            }
-            return pathWithoutPackage;
-        } else {
-            return path;
-        }
     }
 
     @NonNull private String getFullClassName(StackTraceElement element) {
@@ -109,7 +107,7 @@ public class Pine extends Timber.DebugTree {
         return original;
     }
 
-    protected String createStackElementMessage(String originalMessage, StackTraceElement element) {
+    private String createStackElementMessage(String originalMessage, StackTraceElement element) {
         return getClassName(element)
                 + ", " + element.getMethodName()
                 + ", " + Integer.toString(element.getLineNumber())

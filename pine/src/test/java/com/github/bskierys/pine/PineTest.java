@@ -1,23 +1,34 @@
 package com.github.bskierys.pine;
 
+import android.content.Context;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Locale;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
-// TODO: 2016-11-09 write more tests --> see original timber tests
 public class PineTest {
+    private static final String MOCK_PACKAGE_NAME = "com.example.pine";
+    private static final String SAMPLE_PACKAGE_TAG = "pine";
+
+    @Mock Context context;
     private Pine tree;
 
     @Before public void setUp() throws Exception {
-        tree = new Pine();
+        MockitoAnnotations.initMocks(this);
+        when(context.getPackageName()).thenReturn(MOCK_PACKAGE_NAME);
+
+        tree = new Pine(context, SAMPLE_PACKAGE_TAG);
     }
 
     @Test public void testCreateLogTag1() throws Exception {
-        String className = "pl.ipebk.tabi.utils.advancedHelpers.SearchMvpViewPresenterHelper";
-        String expected = "tbi.tls.dvncd.hlprs";
+        String className = MOCK_PACKAGE_NAME + ".utils.advancedHelpers.SearchMvpViewPresenterHelper";
+        String expected = SAMPLE_PACKAGE_TAG + ".tls.dvncd.hlprs";
 
         StackTraceElement element = new StackTraceElement(className, "fakeMethod", "fakeFile", 67);
         String actual = tree.createStackElementTag(element);
@@ -26,8 +37,8 @@ public class PineTest {
     }
 
     @Test public void testCreateLogTag2() throws Exception {
-        String className = "pl.ipebk.tabi.communication.bluetooth.wrappers.SppClientDaemonWrapper";
-        String expected = "tbi.cmmnctn.bltth.wrpprs";
+        String className = MOCK_PACKAGE_NAME + ".communication.bluetooth.wrappers.SppClientDaemonWrapper";
+        String expected = SAMPLE_PACKAGE_TAG + ".cmmnctn.bltth.wrpprs";
 
         StackTraceElement element = new StackTraceElement(className, "fakeMethod", "fakeFile", 67);
         String actual = tree.createStackElementTag(element);
@@ -37,7 +48,7 @@ public class PineTest {
 
     @Test public void testCreateLogTagForDifferentPackage() throws Exception {
         String className = "com.github.package.communication.bluetooth.wrappers.SppClientDaemonWrapper";
-        String expected = "PACKAGE.cmmnctn.bltth.wrpprs";
+        String expected = "cm.gthb.pckg.cmmnctn.bltth.wrpprs";
 
         StackTraceElement element = new StackTraceElement(className, "fakeMethod", "fakeFile", 67);
         String actual = tree.createStackElementTag(element);
@@ -46,14 +57,14 @@ public class PineTest {
     }
 
     @Test public void testCreateLogMessage() throws Exception {
-        String packageName = "pl.ipebk.tabi.communication.bluetooth.wrappers";
+        String packageName = MOCK_PACKAGE_NAME + ".communication.bluetooth.wrappers";
         String className = "SppClientDaemonWrapper";
         String fullClassName = packageName + "." + className;
         String methodName = "onError";
         int line = 67;
         String message = "Hello world!";
 
-        String expectedTag = "tbi.cmmnctn.bltth.wrpprs";
+        String expectedTag = SAMPLE_PACKAGE_TAG + ".cmmnctn.bltth.wrpprs";
         String expectedMessage = String.format(Locale.UK, "%s, %s, %d ---> %s", className, methodName, line, message);
 
         StackTraceElement element = new StackTraceElement(fullClassName, methodName, "fakeFile", line);
@@ -62,5 +73,19 @@ public class PineTest {
 
         assertEquals(expectedTag, actualTag);
         assertEquals(expectedMessage, actualMessage);
+    }
+
+    @Test public void textCreateLogTagLongPackage() throws Exception {
+        String longPackage = "com.example.pine.sample";
+        when(context.getPackageName()).thenReturn(longPackage);
+        tree = new Pine(context, SAMPLE_PACKAGE_TAG);
+
+        String className = longPackage + ".utils.advancedHelpers.SearchMvpViewPresenterHelper";
+        String expected = SAMPLE_PACKAGE_TAG + ".tls.dvncd.hlprs";
+
+        StackTraceElement element = new StackTraceElement(className, "fakeMethod", "fakeFile", 67);
+        String actual = tree.createStackElementTag(element);
+
+        assertEquals(expected, actual);
     }
 }

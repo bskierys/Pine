@@ -24,6 +24,7 @@ ext {
     junitVersion = '4.12'
     butterKnifeVersion = '8.4.0'
     robolectricVersion = '3.0'
+    mockitoVersion = '2.2.15'
     timberVersion = '4.3.1'
     rxjavaVersion = '1.2.2'
 
@@ -45,5 +46,6 @@ ext {
             // Unit test dependencies
             junit               : "junit:junit:${junitVersion}",
             robolectric         : "org.robolectric:robolectric:${robolectricVersion}",
+            mockito             : "org.mockito:mockito-core:${mockitoVersion}",
     ]
 }
