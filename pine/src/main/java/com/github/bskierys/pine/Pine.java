@@ -16,15 +16,14 @@ import timber.log.Timber;
 /**
  * Replacement for {@link timber.log.Timber.DebugTree} that constructs tags in way that can be easy searched within
  * android monitor.
- *
- * Default tag pattern for your package: {@link #packageTag}.{package name without base package. Vowels
- * are removed to match tag length limit}.
- *
- * Default log message: {class name}, {method name}, {line number} --->
- * {message}
- *
- * Default tag pattern for other packages: {package name without base package. Vowels are removed to match tag
- * length limit}.
+ * <p>
+ * <li>Default tag pattern for your package: {@link #packageTag}.{package name without base package. Vowels are removed
+ * to match tag length limit}.</li>
+ * <p>
+ * <li>Default log message: {class name}, {method name}, {line number} ---> {message}</li>
+ * <p>
+ * <li>Default tag pattern for other packages: {package name without base package. Vowels are removed to match tag
+ * length limit}.</li>
  */
 public class Pine extends Timber.DebugTree {
     private static final int CALL_STACK_INDEX = 5;
@@ -34,6 +33,12 @@ public class Pine extends Timber.DebugTree {
     private String packageName;
     private String packageTag;
 
+    /**
+     * Grows basic {@link Pine}.
+     *
+     * @param context Context to get package name from
+     * @param packageTag Simple tag to replace your base package in logs
+     */
     public Pine(Context context, String packageTag) {
         this.packageTag = packageTag;
         this.packageName = context.getPackageName();
@@ -102,7 +107,7 @@ public class Pine extends Timber.DebugTree {
         return original;
     }
 
-    protected String createStackElementMessage(String originalMessage, StackTraceElement element) {
+    private String createStackElementMessage(String originalMessage, StackTraceElement element) {
         return getClassName(element)
                 + ", " + element.getMethodName()
                 + ", " + Integer.toString(element.getLineNumber())
