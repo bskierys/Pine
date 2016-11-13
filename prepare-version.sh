@@ -67,11 +67,11 @@ read_auth() {
 }
 
 generate_changelog() {
-	github_changelog_generator -u bskierys -p LockableViewPager --token ${auth_token} --include-labels bug,feature,ci --output ${changelog_file} --no-verbose --future-release ${version}
+	github_changelog_generator -u bskierys -p Pine --token ${auth_token} --include-labels bug,feature,ci --output ${changelog_file} --no-verbose --future-release ${version}
 }
 
 generate_release_notes() {
-	github_changelog_generator -u bskierys -p LockableViewPager --token ${auth_token} --include-labels fixed --exclude-labels ci,task,invalid,testing --output ${temp_file} --simple-list --no-verbose --future-release ${version}
+	github_changelog_generator -u bskierys -p Pine --token ${auth_token} --include-labels fixed --exclude-labels ci,task,invalid,testing --output ${temp_file} --simple-list --no-verbose --future-release ${version}
 	./edit_release_notes.rb -i ${temp_file} -o ${release_notes_file}
 	rm ${temp_file}
 }
