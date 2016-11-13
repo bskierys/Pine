@@ -36,7 +36,7 @@ check_if_release() {
 
 get_curr_version() {
 	get_curr_branch
-	version=${branch#*"release/"}
+	version=${branch#*"releases/"}
 }
 
 replace_version() {
