@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">@color/mint_green</color>
+    <color name="colorPrimaryDark">@color/fern</color>
+    <color name="colorAccent">@color/fuchsia_pink</color>
+    
+    <color name="fern">#68BD72</color>
+    <color name="mint_green">#89f996</color>
+    <color name="fuchsia_pink">#BD68B3</color>
+
+    <!--  black transparency  -->
+    <color name="black_90">#e6000000</color>
+    <color name="black_87">#de000000</color>
+    <color name="black_80">#cc000000</color>
+    <color name="black_70">#b3000000</color>
+    <color name="black_60">#99000000</color>
+    <color name="black_50">#80000000</color>
+    <color name="black_40">#66000000</color>
+    <color name="black_30">#4d000000</color>
+    <color name="black_20">#33000000</color>
+    <color name="black_12">#1f000000</color>
+    <color name="black_10">#1a000000</color>
 </resources>
