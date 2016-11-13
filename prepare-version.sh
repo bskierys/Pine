@@ -29,7 +29,7 @@ get_curr_branch() {
 
 check_if_release() {
     get_curr_branch
-    if ! echo $branch | grep -E 'release/.*' > /dev/null; then
+    if ! echo $branch | grep -E 'releases/.*' > /dev/null; then
         error_exit "$branch is not a release branch"  
     fi
 }
