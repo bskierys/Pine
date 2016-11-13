@@ -1,0 +1,62 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.4.2'
+    }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'com.getkeepsafe.dexcount'
+
+android {
+    def globalConfiguration = rootProject.extensions.getByName("ext")
+
+    compileSdkVersion globalConfiguration.getAt("libraryCompileSdkVersion")
+    buildToolsVersion globalConfiguration.getAt("libraryBuildToolsVersion")
+
+    defaultConfig {
+        applicationId "com.github.bskierys.pine.sample"
+        minSdkVersion globalConfiguration.getAt("libraryMinSdkVersion")
+        targetSdkVersion globalConfiguration.getAt("libraryTargetSdkVersion")
+        versionCode globalConfiguration.getAt("libraryVersionCode")
+        versionName globalConfiguration.getAt("libraryVersionName")
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(':pine')
+
+    def mobileDependencies = rootProject.ext.mobileDependencies
+
+    // Android
+    compile mobileDependencies.appcompat
+
+    // RxJava
+    compile mobileDependencies.rxjava
+
+    // butterknife
+    compile mobileDependencies.butterknife
+    apt mobileDependencies.butterknife_compiler
+
+    // unit testing
+    testCompile mobileDependencies.junit
+}

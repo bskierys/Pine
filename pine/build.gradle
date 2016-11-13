@@ -1,0 +1,119 @@
+apply plugin: 'com.android.library'
+
+def globalConfiguration = rootProject.extensions.getByName("ext")
+
+android {
+    compileSdkVersion globalConfiguration.getAt("libraryCompileSdkVersion")
+    buildToolsVersion globalConfiguration.getAt("libraryBuildToolsVersion")
+
+    defaultConfig {
+        minSdkVersion globalConfiguration.getAt("libraryMinSdkVersion")
+        targetSdkVersion globalConfiguration.getAt("libraryTargetSdkVersion")
+        versionCode globalConfiguration.getAt("libraryVersionCode")
+        versionName globalConfiguration.getAt("libraryVersionName")
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    def mobileDependencies = rootProject.ext.mobileDependencies
+
+    // Timber
+    compile mobileDependencies.timber
+
+    // Android
+    compile mobileDependencies.support
+
+    // unit testing
+    testCompile mobileDependencies.junit
+    testCompile mobileDependencies.mockito
+}
+
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+version = globalConfiguration.getAt("libraryVersionName")
+
+def siteUrl = 'https://github.com/bskierys/Pine'
+def gitUrl = 'https://github.com/bskierys/Pine.git'
+group = "com.github.bskierys.pine"
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name 'Pine'
+            description 'Simple extension for Android ViewPager that can be locked for swiping'
+            url siteUrl
+
+            packaging 'aar'
+
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+            scm {
+                connection gitUrl
+                url siteUrl
+
+            }
+            developers {
+                developer {
+                    id 'bskierys'
+                    name 'Bartlomiej Kierys'
+                    email 'bskierys@gmail.com'
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+afterEvaluate {
+    javadoc.classpath += files(android.libraryVariants.collect { variant ->
+        variant.javaCompile.classpath.files
+    })
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    configurations = ['archives']
+    pkg {
+        repo = 'Maven'
+        name = 'Pine'
+        userOrg = user
+        licenses = ['Apache-2.0']
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        publish = true
+    }
+}
