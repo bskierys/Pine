@@ -23,3 +23,9 @@ test:
     - cp -r pine/build/outputs $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
     - cp -r pine/build/reports/tests/release/* $CIRCLE_TEST_REPORTS
+deployment:
+  release:
+    tag: /v[0-9]+(\.[0-9]+)*/
+    commands:
+      - chmod +x deploy.sh
+      - ./deploy.sh
