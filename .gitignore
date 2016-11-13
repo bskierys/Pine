@@ -14,6 +14,9 @@ Pine.iml
 *.orig
 *.REMOTE
 
+# private files
+*.priv
+
 # IDEA/Android Studio ignores
 *.iml
 *.ipr
