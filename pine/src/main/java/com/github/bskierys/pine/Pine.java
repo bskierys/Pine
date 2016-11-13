@@ -14,16 +14,11 @@ import java.util.regex.Pattern;
 import timber.log.Timber;
 
 /**
- * Replacement for {@link timber.log.Timber.DebugTree} that constructs tags in way that can be easy searched within
- * android monitor.
- * <p>
- * <li>Default tag pattern for your package: {@link #packageTag}.{package name without base package. Vowels are removed
- * to match tag length limit}.</li>
- * <p>
- * <li>Default log message: {class name}, {method name}, {line number} ---> {message}</li>
- * <p>
- * <li>Default tag pattern for other packages: {package name without base package. Vowels are removed to match tag
- * length limit}.</li>
+ * <p>Replacement for {@link timber.log.Timber.DebugTree} that constructs tags in way that can be easy searched within
+ * android monitor.</p> <ul> <li>Default tag pattern for your package: {@link #packageTag}.{package name without base
+ * package. Vowels are removed to match tag length limit}.</li> <li>Default log message: {class name}, {method name},
+ * {line number} ---&gt; {message}. </li> <li>Default tag pattern for other packages: {package name without base package.
+ * Vowels are removed to match tag length limit}. </li> </ul>
  */
 public class Pine extends Timber.DebugTree {
     private static final int CALL_STACK_INDEX = 5;

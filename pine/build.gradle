@@ -35,3 +35,85 @@ dependencies {
     testCompile mobileDependencies.junit
     testCompile mobileDependencies.mockito
 }
+
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+version = globalConfiguration.getAt("libraryVersionName")
+
+def siteUrl = 'https://github.com/bskierys/Pine'
+def gitUrl = 'https://github.com/bskierys/Pine.git'
+group = "com.github.bskierys.pine"
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name 'Pine'
+            description 'Simple extension for Android ViewPager that can be locked for swiping'
+            url siteUrl
+
+            packaging 'aar'
+
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+            scm {
+                connection gitUrl
+                url siteUrl
+
+            }
+            developers {
+                developer {
+                    id 'bskierys'
+                    name 'Bartlomiej Kierys'
+                    email 'bskierys@gmail.com'
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+afterEvaluate {
+    javadoc.classpath += files(android.libraryVariants.collect { variant ->
+        variant.javaCompile.classpath.files
+    })
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    configurations = ['archives']
+    pkg {
+        repo = 'Maven'
+        name = 'Pine'
+        userOrg = user
+        licenses = ['Apache-2.0']
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        publish = true
+    }
+}
