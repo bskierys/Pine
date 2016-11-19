@@ -27,11 +27,15 @@ ext {
     mockitoVersion = '2.2.15'
     timberVersion = '4.3.1'
     rxjavaVersion = '1.2.2'
+    autoValueVersion = '1.2'
 
     mobileDependencies = [
             // Android
             appcompat           : "com.android.support:appcompat-v7:${androidSupportVersion}",
             support             : "com.android.support:support-v4:${androidSupportVersion}",
+
+            // auto-value
+            autovalue           : "com.google.auto.value:auto-value:${autoValueVersion}",
 
             // Timber
             timber              : "com.jakewharton.timber:timber:${timberVersion}",
