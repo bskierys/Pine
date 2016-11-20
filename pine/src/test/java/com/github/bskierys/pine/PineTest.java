@@ -11,7 +11,7 @@ public class PineTest {
 
     // default strategies
     @Test public void testCreateLogTagRemovesVowels() throws Exception {
-        Pine.TagStrategy strategy = new Pine.DefaultTagStrategy();
+        Pine.TagFormatter strategy = new Pine.DefaultTagFormatter();
 
         String packageName = PACKAGE_REPLACEMENT_INDICATOR + ".utils.advancedHelpers";
         Pine.LogInfo info = new AutoValue_Pine_LogInfo(packageName, "fakeClass", "fakeMethod", 67);
@@ -23,7 +23,7 @@ public class PineTest {
     }
 
     @Test public void testCreateLogTagDoesNotRemoveVowelOnlyComponents() throws Exception {
-        Pine.TagStrategy strategy = new Pine.DefaultTagStrategy();
+        Pine.TagFormatter strategy = new Pine.DefaultTagFormatter();
 
         String packageName = PACKAGE_REPLACEMENT_INDICATOR + ".communication.ui.wrappers";
         Pine.LogInfo info = new AutoValue_Pine_LogInfo(packageName, "fakeClass", "fakeMethod", 67);
@@ -35,7 +35,7 @@ public class PineTest {
     }
 
     @Test public void testCreateLogTagWorksWhenNoReplacement() throws Exception {
-        Pine.TagStrategy strategy = new Pine.DefaultTagStrategy();
+        Pine.TagFormatter strategy = new Pine.DefaultTagFormatter();
 
         String packageName = "com.github.bskierys.communication.ui.wrappers";
         Pine.LogInfo info = new AutoValue_Pine_LogInfo(packageName, "fakeClass", "fakeMethod", 67);
@@ -47,7 +47,7 @@ public class PineTest {
     }
 
     @Test public void testCreateLogMessage() throws Exception {
-        Pine.MessageStrategy strategy = new Pine.DefaultMessageStrategy();
+        Pine.MessageFormatter strategy = new Pine.DefaultMessageFormatter();
 
         String packageName = "com.github.bskierys.communication.bluetooth.wrappers";
         String className = "SppClientDaemonWrapper";
@@ -66,7 +66,6 @@ public class PineTest {
         assertEquals(expectedMessage, actualMessage);
     }
 
-    // TODO: 2016-11-19 test #getLogInfo
     // TODO: 2016-11-19 test builder
     @Test public void testReplacesPackage() throws Exception {
         String packageName = "com.github.bskierys";
@@ -91,5 +90,53 @@ public class PineTest {
 
         String expectedPackage = PACKAGE_REPLACEMENT_INDICATOR + ".utils.advancedHelpers";
         assertEquals(expectedPackage, info.packageName());
+    }
+
+    @Test public void testGetClassName() throws Exception {
+        String packageName = "com.github.bskierys.pine.sample";
+        String className = "SearchMvpViewPresenterHelper";
+        String fullClassName = packageName + ".utils.advancedHelpers." + className;
+
+        Pine tree = new Pine.Builder().setPackageReplacePattern(packageName, "REP").grow();
+        StackTraceElement element = new StackTraceElement(fullClassName, "fakeMethod", "fakeFile", 67);
+        Pine.LogInfo info = tree.getLogInfo(element);
+
+        assertEquals(className, info.className());
+    }
+
+    @Test public void testFullReplacePackage() throws Exception {
+        String packageName = "com.github.bskierys";
+        String className = packageName + ".utils.advancedHelpers.SearchMvpViewPresenterHelper";
+
+        Pine tree = new Pine.Builder().setPackageReplacePattern(packageName, "REP")
+                                      .setTagFormatter(new Pine.TagFormatter() {
+                                          @Override public String format(Pine.LogInfo info) {
+                                              return info.packageName();
+                                          }
+                                      }).grow();
+
+        StackTraceElement element = new StackTraceElement(className, "fakeMethod", "fakeFile", 67);
+
+        String expectedTag = "REP.utils.advancedHelpers";
+        String actualTag = tree.createStackElementTag(element);
+        assertEquals(expectedTag, actualTag);
+    }
+
+    @Test public void testFullReplaceLongPackage() throws Exception {
+        String packageName = "com.github.bskierys.pine.sample";
+        String className = packageName + ".utils.advancedHelpers.SearchMvpViewPresenterHelper";
+
+        Pine tree = new Pine.Builder().setPackageReplacePattern(packageName, "REP")
+                                      .setTagFormatter(new Pine.TagFormatter() {
+                                          @Override public String format(Pine.LogInfo info) {
+                                              return info.packageName();
+                                          }
+                                      }).grow();
+
+        StackTraceElement element = new StackTraceElement(className, "fakeMethod", "fakeFile", 67);
+
+        String expectedTag = "REP.utils.advancedHelpers";
+        String actualTag = tree.createStackElementTag(element);
+        assertEquals(expectedTag, actualTag);
     }
 }

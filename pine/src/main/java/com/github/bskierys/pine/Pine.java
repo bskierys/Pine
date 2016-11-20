@@ -16,11 +16,12 @@ import java.util.regex.Pattern;
 import timber.log.Timber;
 
 /**
- * <p>Replacement for {@link timber.log.Timber.DebugTree} that constructs tags in way that can be easy searched within
- * android monitor.</p> <ul> <li>Default tag pattern for your package: {@link #packageTag}.{package name without base
- * package. Vowels are removed to match tag length limit}.</li> <li>Default log message: {class name}, {method name},
- * {line number} ---&gt; {message}. </li> <li>Default tag pattern for other packages: {package name without base
- * package. Vowels are removed to match tag length limit}. </li> </ul>
+ * <p>Replacement for {@link timber.log.Timber.DebugTree} logs all info about where message was logged from.</p> <p>Use
+ * {@link #growDefault()} to use default implementation or use {@link Builder} to customize.</p> <p>Default
+ * implementation:</p> <ul> <li>Tag: by default your tag will be the name of your package. Vowels are removed to reduce
+ * length of tag. You can use Builder method {@link Builder#setPackageReplacePattern(String, String)} to replace any
+ * package with short phrase (your app name for example)</li> <li>Message: {class name}, {method name}, {line number}
+ * ---&gt; {message}. </li> </ul>
  */
 public class Pine extends Timber.DebugTree {
     private static final int CALL_STACK_INDEX = 5;
@@ -30,13 +31,12 @@ public class Pine extends Timber.DebugTree {
 
     private String packageName;
     private String packageTag;
-
-    private final TagStrategy tagStrategy;
-    private final MessageStrategy messageStrategy;
+    private final TagFormatter tagFormatter;
+    private final MessageFormatter messageFormatter;
 
     private Pine(Builder builder) {
-        this.tagStrategy = builder.tagStrategy;
-        this.messageStrategy = builder.messageStrategy;
+        this.tagFormatter = builder.tagFormatter;
+        this.messageFormatter = builder.messageFormatter;
 
         if (builder.packageReplacePattern != null) {
             this.packageName = builder.packageReplacePattern.first;
@@ -44,16 +44,23 @@ public class Pine extends Timber.DebugTree {
         }
     }
 
+    /**
+     * <p>Grows default implementation of pine.</p> <ul> <li>Tag: by default your tag will be the name of your package.
+     * Vowels are removed to reduce length of tag</li> <li>Message: {class name}, {method name}, {line number} ---&gt;
+     * {message}. </li> </ul>
+     *
+     * @return Default {@link Pine} implementation
+     */
     public static Pine growDefault() {
         return new Builder().grow();
     }
 
     @Override protected String createStackElementTag(StackTraceElement element) {
-        if (tagStrategy == null) {
+        if (tagFormatter == null) {
             throw new NullPointerException("Tag formatting strategy is null. This should not happen...");
         }
 
-        String tag = tagStrategy.format(getLogInfo(element));
+        String tag = tagFormatter.format(getLogInfo(element));
 
         return applyPackageReplacing(tag);
     }
@@ -76,11 +83,11 @@ public class Pine extends Timber.DebugTree {
         }
 
         StackTraceElement element = stackTrace[CALL_STACK_INDEX];
-        if (messageStrategy == null) {
+        if (messageFormatter == null) {
             throw new NullPointerException("Message formatting strategy is null. This should not happen...");
         }
 
-        String formattedMessage = messageStrategy.format(getMessageInfo(element, message));
+        String formattedMessage = messageFormatter.format(getMessageInfo(element, message));
 
         super.log(priority, tag, applyPackageReplacing(formattedMessage), t);
     }
@@ -122,6 +129,10 @@ public class Pine extends Timber.DebugTree {
         return className.substring(className.lastIndexOf('.') + 1, className.length());
     }
 
+    /**
+     * <p>Wrapper for information about where message was logged from. Available info:</p> <ul> <li>package name</li>
+     * <li>class name</li> <li>method name</li> <li>line number</li> </ul>
+     */
     @AutoValue
     public static abstract class LogInfo {
         public abstract String packageName();
@@ -130,61 +141,100 @@ public class Pine extends Timber.DebugTree {
         public abstract int lineNumber();
     }
 
+    /**
+     * <p>Wrapper for information about where message was logged from. Available info:</p> <ul> <li>all available in
+     * {@link LogInfo}</li> <li>actual message</li> </ul>
+     */
     @AutoValue
     public static abstract class MessageInfo {
         abstract LogInfo logInfo();
         public abstract String message();
 
         public String packageName() {return logInfo().packageName();}
+
         public String className() {return logInfo().className();}
+
         public String methodName() {return logInfo().methodName();}
+
         public int lineNumber() {return logInfo().lineNumber();}
     }
 
-    public interface TagStrategy {
+    /**
+     * Interface to format log tag the way you like. When formatting you can use all the data from {@link LogInfo}
+     */
+    public interface TagFormatter {
         String format(LogInfo info);
     }
 
-    public interface MessageStrategy {
+    /**
+     * Interface to format log message the way you like. When formatting you can use all the data from {@link
+     * MessageInfo}
+     */
+    public interface MessageFormatter {
         String format(MessageInfo info);
     }
 
+    /**
+     * Builder for {@link Pine}
+     */
     public static class Builder {
-        private MessageStrategy messageStrategy;
-        private TagStrategy tagStrategy;
+        private MessageFormatter messageFormatter;
+        private TagFormatter tagFormatter;
         private Pair<String, String> packageReplacePattern;
 
-        public Builder setMessageStrategy(MessageStrategy strategy) {
-            this.messageStrategy = strategy;
+        /**
+         * You can format message you will see in monitor the way you like. When formatting you can use all the data
+         * from {@link MessageInfo}. If not set {@link DefaultMessageFormatter} will be used.
+         */
+        public Builder setMessageFormatter(MessageFormatter formatter) {
+            this.messageFormatter = formatter;
             return this;
         }
 
-        public Builder setTagStrategy(TagStrategy strategy) {
-            this.tagStrategy = strategy;
+        /**
+         * You can format tag you will see in monitor the way you like. When formatting you can use all the data from
+         * {@link LogInfo}. If not set {@link DefaultTagFormatter} will be used.
+         */
+        public Builder setTagFormatter(TagFormatter formatter) {
+            this.tagFormatter = formatter;
             return this;
         }
 
+        /**
+         * Replace package name with short phrase.
+         *
+         * @param packageName Package name to be replaced
+         * @param replacement Phrase to replace package with
+         */
         public Builder setPackageReplacePattern(String packageName, String replacement) {
             this.packageReplacePattern = new Pair<>(packageName, replacement);
             return this;
         }
 
         private void initEmptyFieldsWithDefaultValues() {
-            if (messageStrategy == null) {
-                messageStrategy = new DefaultMessageStrategy();
+            if (messageFormatter == null) {
+                messageFormatter = new DefaultMessageFormatter();
             }
-            if (tagStrategy == null) {
-                tagStrategy = new DefaultTagStrategy();
+            if (tagFormatter == null) {
+                tagFormatter = new DefaultTagFormatter();
             }
         }
 
+        /**
+         * Builds {@link Pine} object
+         */
         public Pine grow() {
             initEmptyFieldsWithDefaultValues();
             return new Pine(this);
         }
     }
 
-    public static class DefaultTagStrategy implements TagStrategy {
+    /**
+     * Default tag formatter. Tag: by default your tag will be the name of your package. Vowels are removed to reduce
+     * length of tag. You can use Builder method {@link Builder#setPackageReplacePattern(String, String)} to replace any
+     * package with short phrase (your app name for example)
+     */
+    public static class DefaultTagFormatter implements TagFormatter {
         @Override public String format(LogInfo info) {
             StringBuilder tag = new StringBuilder();
 
@@ -221,7 +271,10 @@ public class Pine extends Timber.DebugTree {
         }
     }
 
-    public static class DefaultMessageStrategy implements MessageStrategy {
+    /**
+     * Default message formatter. Message: {class name}, {method name}, {line number} ---&gt; {message}.
+     */
+    public static class DefaultMessageFormatter implements MessageFormatter {
         private static final String DELIMITER = " ---> ";
 
         @Override public String format(MessageInfo info) {
