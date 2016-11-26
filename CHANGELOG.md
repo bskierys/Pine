@@ -1,6 +1,16 @@
 # Change Log
 
-## [0.1.0](https://github.com/bskierys/Pine/tree/0.1.0) (2016-11-13)
+## [0.2.0](https://github.com/bskierys/Pine/tree/0.2.0) (2016-11-26)
+[Full Changelog](https://github.com/bskierys/Pine/compare/v0.1.0...0.2.0)
+
+**Closed issues:**
+
+- Update Readme.md for release 0.2 [\#15](https://github.com/bskierys/Pine/issues/15)
+- Add possibility to add more replaced packages [\#14](https://github.com/bskierys/Pine/issues/14)
+- Create github page [\#8](https://github.com/bskierys/Pine/issues/8)
+- Pine strategies to support different log formatting [\#6](https://github.com/bskierys/Pine/issues/6)
+
+## [v0.1.0](https://github.com/bskierys/Pine/tree/v0.1.0) (2016-11-13)
 **Fixed bugs:**
 
 - Fix circleCi builds [\#9](https://github.com/bskierys/Pine/issues/9)
