@@ -1,5 +1,8 @@
 Release Notes
-## [0.1.0] (2016-11-13)
+## [0.2.0] (2016-11-26)
+- Add possibility to add more replaced packages 
+- Pine strategies to support different log formatting 
+## [v0.1.0] (2016-11-13)
 - Sample app UI 
 - Sample app design 
 - Pine construction to support different projects
