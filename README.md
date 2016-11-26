@@ -11,21 +11,65 @@ _**Ho Chi Minh**_
 
 This is a tree for a great logger library [Timber](https://github.com/JakeWharton/timber) by Jake Wharton.
 
-**Pine** is extension for default DebugTree. It automatically logs class, method, and line number where it was invoked. It also has package-driven tagging which works nice with MVP project structure.
+**Pine** is extension for default DebugTree. It has ability to log class, method, and line number where it was invoked. It also has package-driven tagging which works nice with MVP project structure.
 
 Just like Jake Wharton I was tired of copying this one class to every single project, so I made it a library.
 
-##Usage
+##Basic usage
 ----------------------
 Pine is `Timber.Tree` implementation. Just plant it to Timber.
 
 ```java
-Timber.plant(new Pine(application, "appTag"));
+Timber.plant(Pine.growDefault());
 ```
-Pine is using `Context` and `appTag` to build default log tag. Your tags will always start with `appTag`. See section [Log format](#log-format) for more information.
+Default implementation tags logs with package name for class that called `Timber`. See section [Log format](#log-format) for more information.
+
+##Replacing package names
+----------------------
+If you are tired of seeing full package of your app in every log, you can easy replace it with short word. Use `Pine.Builder`.
+
+```java
+Pine pineWithReplace = new Pine.Builder()
+                .addPackageReplacePattern(getPackageName(), "PINE")
+                .addPackageReplacePattern("com.github.simonpercic.oklog", "OKLOG")
+                .grow();
+
+// plant a pine at the beginning of application lifecycle
+if (BuildConfig.DEBUG) {
+    Timber.plant(pineWithReplace);
+}
+```
+
+Your logs will start looking like this:
+```
+D/PINE.tls.dvncd.hlprs: MainActivity, lambda$onCreate$0, 51 ---> Debug message
+```
+Instead of this
+```
+D/cm.gthb.bskrs.smpl.tls.dvncd.hlprs: MainActivity, lambda$onCreate$0, 51 ---> Debug message
+```
+
+You can replace as many packages as you like. Or you can provide different phrases for different submodules of your app.
+
+##Advanced usage
+----------------------
+
+If you like you can override default tag and message formatting using `setTagFormatter` and `setMessageFormatter` in `Pine.Builder` class. To format your tag or message you can use all the info available in `LogInfo` class.
+Example of custom Pine planted in application class:
+
+```java
+Pine customPine = new Pine.Builder()
+                .addPackageReplacePattern(getPackageName(), "PINE")
+                .setTagFormatter(LogInfo::packageName)
+                .setMessageFormatter(info -> {
+                    return String.format(Locale.getDefault(), "%s#%s, %d ----> %s", info.className(),
+                                         info.methodName(), info.lineNumber(), info.message());
+                })
+                .grow();
+```
 
 ##Installation
-----
+----------------------
 
 Available from jCenter.
 
@@ -33,7 +77,7 @@ Gradle:
 
 ```groovy
 dependencies {
-    compile 'com.github.bskierys.pine:pine:0.1.0'
+    compile 'com.github.bskierys.pine:pine:0.2.0'
 }
 ```
 
@@ -46,9 +90,9 @@ dependencies {
  
 **Example log:**
 ```
-D/pine.tls.dvncd.hlprs: MainActivity, lambda$onCreate$0, 51 ---> Debug message
+D/PINE.tls.dvncd.hlprs: MainActivity, lambda$onCreate$0, 51 ---> Debug message
 ```
-This means your log was invoked in `com.github.bskierys.pine.utis.advancedHelpers.MainActivity#onCreate` method (line 51). My package `com.github.bskierys.pine` was replaced with `pine`.
+This means your log was invoked in `com.github.bskierys.pine.utis.advancedHelpers.MainActivity#onCreate` method (line 51). My package `com.github.bskierys.pine` was replaced with `PINE`.
 See sample app for more examples.
 
 ##License
