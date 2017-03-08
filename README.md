@@ -11,7 +11,7 @@ _**Ho Chi Minh**_
 
 This is a tree for a great logger library [Timber](https://github.com/JakeWharton/timber) by Jake Wharton.
 
-**Pine** is extension for default DebugTree. It has ability to log class, method, and line number where it was invoked. It also has package-driven tagging which works nice with MVP project structure.
+**Pine** is extension for default Timber DebugTree that logs class, method, and line number where it was invoked to help the developer locate log source easily.
 
 Just like Jake Wharton I was tired of copying this one class to every single project, so I made it a library.
 
