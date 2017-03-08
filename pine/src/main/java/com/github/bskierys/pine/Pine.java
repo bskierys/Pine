@@ -7,6 +7,7 @@ package com.github.bskierys.pine;
 
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,9 +29,11 @@ public class Pine extends Timber.DebugTree {
     private final PackageNameHelper packageNameHelper;
     private final TagFormatter tagFormatter;
     private final MessageFormatter messageFormatter;
+    private final ArrayList<LogAction> logActions;
 
     private Pine(Builder builder) {
         this.tagFormatter = builder.tagFormatter;
+        this.logActions = builder.logActions;
         this.messageFormatter = builder.messageFormatter;
         this.packageNameHelper = new PackageNameHelper(builder.packageReplacePatterns);
     }
@@ -46,7 +49,8 @@ public class Pine extends Timber.DebugTree {
         return new Builder().grow();
     }
 
-    @Override protected String createStackElementTag(StackTraceElement element) {
+    @Override
+    protected String createStackElementTag(StackTraceElement element) {
         if (tagFormatter == null) {
             throw new NullPointerException("Tag formatting strategy is null. This should not happen...");
         }
@@ -56,7 +60,8 @@ public class Pine extends Timber.DebugTree {
         return packageNameHelper.replacePatternWithReplacement(tag);
     }
 
-    @Override protected void log(int priority, String tag, String message, Throwable t) {
+    @Override
+    protected void log(int priority, String tag, String message, Throwable t) {
         // DO NOT switch this to Thread.getCurrentThread().getStackTrace(). The test will pass
         // because Robolectric runs them on the JVM but on Android the elements are different.
         StackTraceElement[] stackTrace = new Throwable().getStackTrace();
@@ -72,6 +77,9 @@ public class Pine extends Timber.DebugTree {
 
         String formattedMessage = messageFormatter.format(getMessageInfo(element, message));
 
+        for (int i = 0; i < logActions.size(); i++) {
+            logActions.get(i).action(priority, tag, formattedMessage, t);
+        }
         super.log(priority, tag, packageNameHelper.replacePatternWithReplacement(formattedMessage), t);
     }
 
@@ -90,7 +98,8 @@ public class Pine extends Timber.DebugTree {
         return new AutoValue_LogInfo(packageName, className, methodName, lineNumber);
     }
 
-    @NonNull private String getFullClassName(StackTraceElement element) {
+    @NonNull
+    private String getFullClassName(StackTraceElement element) {
         String className = element.getClassName();
         Matcher m = ANONYMOUS_CLASS.matcher(className);
         if (m.find()) {
@@ -100,12 +109,14 @@ public class Pine extends Timber.DebugTree {
         return className;
     }
 
-    @NonNull private String getPackageName(StackTraceElement element) {
+    @NonNull
+    private String getPackageName(StackTraceElement element) {
         String className = getFullClassName(element);
         return getFullClassName(element).substring(0, className.lastIndexOf('.'));
     }
 
-    @NonNull private String getClassName(StackTraceElement element) {
+    @NonNull
+    private String getClassName(StackTraceElement element) {
         String className = getFullClassName(element);
         return className.substring(className.lastIndexOf('.') + 1, className.length());
     }
@@ -117,6 +128,7 @@ public class Pine extends Timber.DebugTree {
         private MessageFormatter messageFormatter;
         private TagFormatter tagFormatter;
         private LinkedHashMap<String, String> packageReplacePatterns = new LinkedHashMap<>();
+        private ArrayList<LogAction> logActions = new ArrayList<>();
 
         /**
          * You can format message you will see in monitor the way you like. When formatting you can use all the data
@@ -144,6 +156,14 @@ public class Pine extends Timber.DebugTree {
          */
         public Builder addPackageReplacePattern(String packageName, String replacement) {
             this.packageReplacePatterns.put(packageName, replacement);
+            return this;
+        }
+
+        /**
+         * You can make additional action with this log.
+         */
+        public Builder addLogAction(LogAction logAction) {
+            this.logActions.add(logAction);
             return this;
         }
 
