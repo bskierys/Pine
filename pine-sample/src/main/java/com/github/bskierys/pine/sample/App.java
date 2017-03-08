@@ -19,8 +19,7 @@ import timber.log.Timber;
 
 public class App extends Application {
 
-    @Override
-    public void onCreate() {
+    @Override public void onCreate() {
         super.onCreate();
 
         // you can use default implementation (package name as tag)

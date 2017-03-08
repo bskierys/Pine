@@ -26,8 +26,7 @@ public class FileLogger implements LogAction {
         dateFormat = SimpleDateFormat.getDateTimeInstance();
     }
 
-    @Override
-    public void action(int priority, String tag, String message, Throwable t) {
+    @Override public void action(int priority, String tag, String message, Throwable t) {
         Date currentDate = new Date();
         String actionMessage = String.format("%s %s: %s\n", dateFormat.format(currentDate), tag, message);
         try {

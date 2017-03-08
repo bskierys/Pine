@@ -1,7 +1,7 @@
 package com.github.bskierys.pine;
 
 /**
- * Interface to make a action on output log message.
+ * Interface to make a additional action on output log message.
  */
 public interface LogAction {
     /**
