@@ -49,8 +49,7 @@ public class Pine extends Timber.DebugTree {
         return new Builder().grow();
     }
 
-    @Override
-    protected String createStackElementTag(StackTraceElement element) {
+    @Override protected String createStackElementTag(StackTraceElement element) {
         if (tagFormatter == null) {
             throw new NullPointerException("Tag formatting strategy is null. This should not happen...");
         }
@@ -60,8 +59,7 @@ public class Pine extends Timber.DebugTree {
         return packageNameHelper.replacePatternWithReplacement(tag);
     }
 
-    @Override
-    protected void log(int priority, String tag, String message, Throwable t) {
+    @Override protected void log(int priority, String tag, String message, Throwable t) {
         // DO NOT switch this to Thread.getCurrentThread().getStackTrace(). The test will pass
         // because Robolectric runs them on the JVM but on Android the elements are different.
         StackTraceElement[] stackTrace = new Throwable().getStackTrace();
@@ -98,8 +96,7 @@ public class Pine extends Timber.DebugTree {
         return new AutoValue_LogInfo(packageName, className, methodName, lineNumber);
     }
 
-    @NonNull
-    private String getFullClassName(StackTraceElement element) {
+    @NonNull private String getFullClassName(StackTraceElement element) {
         String className = element.getClassName();
         Matcher m = ANONYMOUS_CLASS.matcher(className);
         if (m.find()) {
@@ -109,14 +106,12 @@ public class Pine extends Timber.DebugTree {
         return className;
     }
 
-    @NonNull
-    private String getPackageName(StackTraceElement element) {
+    @NonNull private String getPackageName(StackTraceElement element) {
         String className = getFullClassName(element);
         return getFullClassName(element).substring(0, className.lastIndexOf('.'));
     }
 
-    @NonNull
-    private String getClassName(StackTraceElement element) {
+    @NonNull private String getClassName(StackTraceElement element) {
         String className = getFullClassName(element);
         return className.substring(className.lastIndexOf('.') + 1, className.length());
     }
