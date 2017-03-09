@@ -1,7 +1,14 @@
 # Change Log
 
-## [0.2.0](https://github.com/bskierys/Pine/tree/0.2.0) (2016-11-26)
-[Full Changelog](https://github.com/bskierys/Pine/compare/v0.1.0...0.2.0)
+## [0.2.1](https://github.com/bskierys/Pine/tree/0.2.1) (2017-03-09)
+[Full Changelog](https://github.com/bskierys/Pine/compare/v0.2.0...0.2.1)
+
+**Merged pull requests:**
+
+- Added interface to have possibility set custom action on formatted lo… [\#16](https://github.com/bskierys/Pine/pull/16) ([zagulakamil](https://github.com/zagulakamil))
+
+## [v0.2.0](https://github.com/bskierys/Pine/tree/v0.2.0) (2016-11-26)
+[Full Changelog](https://github.com/bskierys/Pine/compare/v0.1.0...v0.2.0)
 
 **Closed issues:**
 
