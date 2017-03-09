@@ -6,16 +6,19 @@
 package com.github.bskierys.pine.sample;
 
 import android.app.Application;
+import android.os.Environment;
 
 import com.github.bskierys.pine.LogInfo;
 import com.github.bskierys.pine.MessageInfo;
 import com.github.bskierys.pine.Pine;
 
+import java.io.File;
 import java.util.Locale;
 
 import timber.log.Timber;
 
 public class App extends Application {
+
     @Override public void onCreate() {
         super.onCreate();
 
@@ -35,6 +38,13 @@ public class App extends Application {
                 .setMessageFormatter(this::formatMessage)
                 .grow();
 
+        // or you can save your logs in file like this (Application needs permission on Marshmallow or newer)
+        FileLogger fileLogger = new FileLogger(new File(Environment.getExternalStorageDirectory(), "PINE-test.log"));
+        Pine fileCustomPine = new Pine.Builder()
+                .addLogAction(fileLogger)
+                .addPackageReplacePattern(getPackageName(), "PINE")
+                .grow();
+
         // plant a pine at the beginning of application lifecycle
         if (BuildConfig.DEBUG) {
             Timber.plant(pineWithReplace);
@@ -43,6 +53,6 @@ public class App extends Application {
 
     private String formatMessage(MessageInfo info) {
         return String.format(Locale.getDefault(), "%s#%s, %d ----> %s", info.className(),
-                             info.methodName(), info.lineNumber(), info.message());
+                info.methodName(), info.lineNumber(), info.message());
     }
 }

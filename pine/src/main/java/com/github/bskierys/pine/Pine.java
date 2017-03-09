@@ -7,6 +7,7 @@ package com.github.bskierys.pine;
 
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,9 +29,11 @@ public class Pine extends Timber.DebugTree {
     private final PackageNameHelper packageNameHelper;
     private final TagFormatter tagFormatter;
     private final MessageFormatter messageFormatter;
+    private final ArrayList<LogAction> logActions;
 
     private Pine(Builder builder) {
         this.tagFormatter = builder.tagFormatter;
+        this.logActions = builder.logActions;
         this.messageFormatter = builder.messageFormatter;
         this.packageNameHelper = new PackageNameHelper(builder.packageReplacePatterns);
     }
@@ -72,6 +75,9 @@ public class Pine extends Timber.DebugTree {
 
         String formattedMessage = messageFormatter.format(getMessageInfo(element, message));
 
+        for (int i = 0; i < logActions.size(); i++) {
+            logActions.get(i).action(priority, tag, formattedMessage, t);
+        }
         super.log(priority, tag, packageNameHelper.replacePatternWithReplacement(formattedMessage), t);
     }
 
@@ -117,6 +123,7 @@ public class Pine extends Timber.DebugTree {
         private MessageFormatter messageFormatter;
         private TagFormatter tagFormatter;
         private LinkedHashMap<String, String> packageReplacePatterns = new LinkedHashMap<>();
+        private ArrayList<LogAction> logActions = new ArrayList<>();
 
         /**
          * You can format message you will see in monitor the way you like. When formatting you can use all the data
@@ -144,6 +151,14 @@ public class Pine extends Timber.DebugTree {
          */
         public Builder addPackageReplacePattern(String packageName, String replacement) {
             this.packageReplacePatterns.put(packageName, replacement);
+            return this;
+        }
+
+        /**
+         * You can make additional action with this log.
+         */
+        public Builder addLogAction(LogAction logAction) {
+            this.logActions.add(logAction);
             return this;
         }
 
