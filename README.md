@@ -1,4 +1,4 @@
-#Pine
+# Pine
 =====================
 [![CircleCI](https://circleci.com/gh/bskierys/Pine/tree/master.svg?style=svg)](https://circleci.com/gh/bskierys/Pine/tree/master)
 [ ![Download](https://api.bintray.com/packages/bskierys/Maven/Pine/images/download.svg) ](https://bintray.com/bskierys/Maven/Pine/_latestVersion)
@@ -15,7 +15,7 @@ This is a tree for a great logger library [Timber](https://github.com/JakeWharto
 
 Just like Jake Wharton I was tired of copying this one class to every single project, so I made it a library.
 
-##Basic usage
+## Basic usage
 ----------------------
 Pine is `Timber.Tree` implementation. Just plant it to Timber.
 
@@ -24,7 +24,7 @@ Timber.plant(Pine.growDefault());
 ```
 Default implementation tags logs with package name for class that called `Timber`. See section [Log format](#log-format) for more information.
 
-##Replacing package names
+## Replacing package names
 ----------------------
 If you are tired of seeing full package of your app in every log, you can easy replace it with short word. Use `Pine.Builder`.
 
@@ -51,7 +51,7 @@ D/cm.gthb.bskrs.smpl.tls.dvncd.hlprs: MainActivity, lambda$onCreate$0, 51 ---> D
 
 You can replace as many packages as you like. Or you can provide different phrases for different submodules of your app.
 
-##Advanced usage
+## Advanced usage
 ----------------------
 
 If you like you can override default tag and message formatting using `setTagFormatter` and `setMessageFormatter` in `Pine.Builder` class. To format your tag or message you can use all the info available in `LogInfo` class.
@@ -68,7 +68,7 @@ Pine customPine = new Pine.Builder()
                 .grow();
 ```
 
-##Installation
+## Installation
 ----------------------
 
 Available from jCenter.
@@ -81,7 +81,7 @@ dependencies {
 }
 ```
 
-##Log format
+## Log format
 
 **Pine** logs consists of two sections. 
 
@@ -95,7 +95,7 @@ D/PINE.tls.dvncd.hlprs: MainActivity, lambda$onCreate$0, 51 ---> Debug message
 This means your log was invoked in `com.github.bskierys.pine.utis.advancedHelpers.MainActivity#onCreate` method (line 51). My package `com.github.bskierys.pine` was replaced with `PINE`.
 See sample app for more examples.
 
-##License
+## License
 -------
 
     Copyright 2016 Bartłomiej Kierys
